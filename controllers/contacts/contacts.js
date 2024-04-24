@@ -102,7 +102,7 @@ const updateContacts = async (req, res, next) => {
     return res.status(400).json({ message: "missing fields" });
   } else {
     try {
-      const updateContact = await updateContact({
+      const updatedContact = await updateContact({
         contactId,
         toUpdate: req.body,
         upsert: true,
@@ -110,8 +110,42 @@ const updateContacts = async (req, res, next) => {
       return res.json({
         status: "success",
         code: 200,
-        data: { updateContact },
+        data: { updatedContact },
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+};
+
+const updateStatusContact = async (req, res, next) => {
+  const { contactId } = req.params;
+  const { favorite } = req.body;
+  if (!favorite) {
+    return res.json({
+      status: "rejected",
+      code: 400,
+      message: "Missing field favorite",
+    });
+  } else {
+    try {
+      const updatedContact = await updateContact({
+        contactId,
+        toUpdate: req.body,
+      });
+      if (!updatedContact) {
+        return res.json({
+          status: "rejected",
+          code: 404,
+          message: "Not found",
+        });
+      } else {
+        return res.json({
+          status: "success",
+          code: 200,
+          data: { updatedContact },
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -124,4 +158,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContacts,
+  updateStatusContact,
 };
