@@ -42,7 +42,7 @@ const getContactById = async (req, res, next) => {
   }
 };
 
-const removeContact = async (req, res, next) => {
+const removesContact = async (req, res, next) => {
   const { id } = req.params;
   const contacts = await listContacts();
   const index = contacts.findIndex((contact) => contact.id === id);
@@ -155,7 +155,7 @@ const updateStatusContact = async (req, res, next) => {
 module.exports = {
   listContacts,
   getContactById,
-  removeContact,
+  removesContact,
   addContact,
   updateContacts,
   updateStatusContact,

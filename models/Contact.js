@@ -23,7 +23,7 @@ const contactSchema = new mongoose.Schema(
   }
 );
 
-contactsSchema.statics.getAll = function () {
+contactSchema.statics.getAll = function () {
   return Contact.find().lean();
 };
 

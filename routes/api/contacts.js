@@ -3,11 +3,11 @@ const express = require("express");
 const {
   listContacts,
   getContactById,
-  removeContact,
+  removesContact,
   addContact,
   updateContacts,
   updateStatusContact,
-} = require("../../controllers/contacts");
+} = require("../../controllers/contacts/contacts");
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router.get("/:contactId", getContactById);
 
 router.post("/", addContact);
 
-router.delete("/:contactId", removeContact);
+router.delete("/:contactId", removesContact);
 
 router.put("/:contactId", updateContacts);
 
