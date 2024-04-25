@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
+const app = require("./app");
 
-require('dotenv').config();
+require("dotenv").config();
+
 const { DB_HOST: urlDb } = process.env;
 const connection = mongoose.connect(urlDb);
 
-const app = require("./app");
 
 const startServer = async () => {
   try {
@@ -14,7 +15,7 @@ const startServer = async () => {
       console.log("Server running. Use our API on port: 3000");
     });
   } catch (error) {
-    console.log(error);
+    console.log(`Server not running. Error message: ${error.message}`);
     process.exit(1);
   }
 };

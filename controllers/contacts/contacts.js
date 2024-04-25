@@ -1,5 +1,3 @@
-const { nanoid } = require("nanoid");
-const fs = require("fs/promises");
 const {
   fetchContacts,
   fetchContact,
@@ -10,12 +8,11 @@ const {
 
 const listContacts = async (req, res, next) => {
   try {
-    const data = await fetchContacts();
-    const contactsList = await JSON.parse(data);
+    const contacts = await fetchContacts();
     res.json({
       status: "success",
       code: 200,
-      data: { contactsList },
+      data: contacts,
     });
   } catch (error) {
     next(error);
@@ -24,28 +21,28 @@ const listContacts = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   try {
-    const contact = await fetchContact(req.params.id);
-    if (!contact) {
+    const { contactId } = req.params;
+    const contact = await fetchContact(contactId);
+    if (contact) {
       return res.json({
-        status: "rejected",
-        code: 404,
-        message: "Not found",
+        status: "success",
+        code: 200,
+        data: contact,
       });
     }
-    return res.json({
-      status: "success",
-      code: 200,
-      data: { contact },
-    });
   } catch (error) {
-    next(error);
+    return res.json({
+      status: "rejected",
+      code: 404,
+      message: "Not found",
+    });
   }
 };
 
 const removesContact = async (req, res, next) => {
-  const { id } = req.params;
-  const contacts = await listContacts();
-  const index = contacts.findIndex((contact) => contact.id === id);
+  const { contactId } = req.params;
+  const contacts = await fetchContacts();
+  const index = contacts.findIndex((contact) => contact.id === contactId);
   if (index === -1) {
     return res.json({
       status: "success",
@@ -54,7 +51,7 @@ const removesContact = async (req, res, next) => {
     });
   } else {
     try {
-      await removeContact(id);
+      await removeContact(contactId);
       return res.json({
         status: "success",
         code: 200,
@@ -89,8 +86,8 @@ const addContact = async (req, res, next) => {
 };
 
 const updateContacts = async (req, res, next) => {
-  const contacts = listContacts();
-  const contactId = req.params;
+  const contacts = await fetchContacts();
+  const { contactId } = req.params;
   const index = contacts.findIndex((contact) => contact.id === contactId);
   if (index === -1) {
     return res.json({

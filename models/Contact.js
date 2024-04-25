@@ -8,9 +8,11 @@ const contactSchema = new mongoose.Schema(
     },
     email: {
       type: String,
+      unique: true,
     },
     phone: {
       type: String,
+      unique: true,
     },
     favorite: {
       type: Boolean,
@@ -23,10 +25,6 @@ const contactSchema = new mongoose.Schema(
   }
 );
 
-contactSchema.statics.getAll = function () {
-  return Contact.find().lean();
-};
-
-const Contact = mongoose.model("contact", contactSchema, "contacts");
+const Contact = mongoose.model("contact", contactSchema);
 
 module.exports = Contact;

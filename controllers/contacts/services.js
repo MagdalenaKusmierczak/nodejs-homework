@@ -1,7 +1,7 @@
 const Contact = require("../../models/Contact");
 
 const fetchContacts = () => {
-  return Contact.getAll();
+  return Contact.find();
 };
 
 const fetchContact = (contactId) => {
@@ -13,7 +13,7 @@ const insertContact = ({ name, email, phone }) => {
 };
 
 const updateContact = async ({ contactId, toUpdate, upsert = false }) => {
-  return Task.findByIdAndUpdate(
+  return Contact.findByIdAndUpdate(
     { _id: contactId },
     { $set: toUpdate },
     { new: true, runValidators: true, strict: "throw", upsert }
