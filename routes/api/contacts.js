@@ -1,4 +1,5 @@
 const express = require("express");
+const authenticate = require("../../middlewares/authenticate");
 
 const {
   listContacts,
@@ -11,19 +12,16 @@ const {
 
 const contactsRouter = express.Router();
 
-router.get("/", listContacts);
+router.get("/", authenticate, listContacts);
 
-router.get("/:contactId", getContactById);
+router.get("/:contactId", authenticate, getContactById);
 
-router.post("/", addContact);
+router.post("/", authenticate, addContact);
 
-router.delete("/:contactId", removesContact);
+router.delete("/:contactId", authenticate, removesContact);
 
-router.put("/:contactId", updateContacts);
+router.put("/:contactId", authenticate, updateContacts);
 
-router.patch("/:contactId/favorite", updateStatusContact);
-
-
-
+router.patch("/:contactId/favorite", authenticate, updateStatusContact);
 
 module.exports = contactsRouter;
