@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const User = require("../../models/User");
 
 require("dotenv").config();
-const { SECRET_KEY } = process.env;
+
 
 const register = async (req, res) => {
   try {
@@ -36,7 +36,7 @@ const register = async (req, res) => {
   }
 };
 
-const login = async ({ req, res }) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!password || !email)
@@ -59,15 +59,15 @@ const login = async ({ req, res }) => {
         id: user._id,
         username: user.username,
       };
-      const token = jwt.sign(payload, SECRET_KEY, {
+      const token = jwt.sign(payload, process.env.SECRET_KEY, {
         expiresIn: "12h",
       });
-      await User.findByIdAndUpdate(user._id, { token });
+      await User.findByIdAndUpdate(user._id,  token );
 
       return res.json({
         status: "OK",
         code: 200,
-        token: token,
+        token,
         user: {
           email: user.email,
           subscription: user.subscription,
@@ -84,9 +84,7 @@ const login = async ({ req, res }) => {
     res.json({
       code: 404,
       status: "Error",
-      body: {
-        message: error.message,
-      },
+      message: error.message,
     });
   }
 };
@@ -103,9 +101,7 @@ const logout = async (req, res) => {
     res.json({
       code: 404,
       status: "Error",
-      body: {
-        message: error.message,
-      },
+      message: error.message,
     });
   }
 };

@@ -6,7 +6,7 @@ const {
   current,
   changeSubscription,
 } = require("../../controllers/users/users");
-const authenticate = require("../../middlewares/authenticate");
+const auth = require("../../middlewares/authenticate");
 
 const usersRouter = express.Router();
 
@@ -14,10 +14,10 @@ usersRouter.post("/signup", register);
 
 usersRouter.post("/login", login);
 
-usersRouter.post("/logout", authenticate, logout);
+usersRouter.post("/logout", auth, logout);
 
-usersRouter.get("/current", authenticate, current);
+usersRouter.get("/current", auth, current);
 
-usersRouter.patch("/", authenticate, changeSubscription);
+usersRouter.patch("/", auth, changeSubscription);
 
 module.exports = usersRouter;
