@@ -10,14 +10,14 @@ const authenticate = require("../../middlewares/authenticate");
 
 const usersRouter = express.Router();
 
-router.post("/signup", register);
+usersRouter.post("/signup", register);
 
-router.post("/login", login);
+usersRouter.post("/login", login);
 
-router.post("/logout", authenticate, logout);
+usersRouter.post("/logout", authenticate, logout);
 
-router.get("/current", authenticate, current);
+usersRouter.get("/current", authenticate, current);
 
-router.patch("/", authenticate, changeSubscription);
+usersRouter.patch("/", authenticate, changeSubscription);
 
 module.exports = usersRouter;

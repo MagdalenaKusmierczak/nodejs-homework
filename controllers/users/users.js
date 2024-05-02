@@ -31,7 +31,7 @@ const register = async (req, res) => {
     res.json({
       code: 404,
       status: "Error",
-      message: err.message,
+      message: error.message,
     });
   }
 };
@@ -85,7 +85,7 @@ const login = async ({ req, res }) => {
       code: 404,
       status: "Error",
       body: {
-        message: err.message,
+        message: error.message,
       },
     });
   }
@@ -104,7 +104,7 @@ const logout = async (req, res) => {
       code: 404,
       status: "Error",
       body: {
-        message: err.message,
+        message: error.message,
       },
     });
   }
@@ -121,7 +121,7 @@ const current = async (req, res) => {
   });
 };
 
-const changeSubscription = async (req, res) => {
+const changeSubscription = async (req, res, next) => {
   const { subscription } = req.body;
   const { id } = req.user;
   if (Object.keys(req.body).length === 0) {
