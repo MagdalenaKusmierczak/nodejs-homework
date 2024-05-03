@@ -4,7 +4,6 @@ const User = require("../../models/User");
 
 require("dotenv").config();
 
-
 const register = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -62,7 +61,7 @@ const login = async (req, res) => {
       const token = jwt.sign(payload, process.env.SECRET_KEY, {
         expiresIn: "12h",
       });
-      await User.findByIdAndUpdate(user._id,  token );
+      await User.findByIdAndUpdate(user._id, token);
 
       return res.json({
         status: "OK",
@@ -92,7 +91,7 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
   const { _id } = req.user;
   try {
-    await User.findByIdAndUpdate(_id, { token: "" });
+    await User.findByIdAndUpdate(_id, { token: null });
     return res.json({
       status: "No Content",
       code: 204,
@@ -107,14 +106,24 @@ const logout = async (req, res) => {
 };
 
 const current = async (req, res) => {
-  const { email, subscription } = req.user;
+  try {
+    const { id } = req.user;
+    const user = await User.findById(id);
 
-  res.status(200).json({
-    code: 200,
-    status: "OK",
-    email,
-    subscription,
-  });
+    return res.json({
+      code: 200,
+      status: "OK",
+      email: user.email,
+      subscription: user.subscription,
+    });
+  } catch (err) {
+    res.json({
+      status: "Error",
+      body: {
+        message: err.message,
+      },
+    });
+  }
 };
 
 const changeSubscription = async (req, res, next) => {

@@ -8,7 +8,8 @@ const {
 
 const listContacts = async (req, res, next) => {
   try {
-    const contacts = await fetchContacts();
+     const {_id: owner} = req.user;
+    const contacts = await fetchContacts(owner);
     res.json({
       status: "success",
       code: 200,
@@ -65,6 +66,7 @@ const removesContact = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   const { name, email, phone } = req.body;
+  const { _id: owner } = req.user;
   try {
     if (!name || !email || !phone) {
       return res.json({
@@ -73,7 +75,7 @@ const addContact = async (req, res, next) => {
         message: "missing required name - field",
       });
     } else {
-      const newContact = await insertContact({ name, email, phone });
+      const newContact = await insertContact({ name, email, phone, owner });
       return res.json({
         status: "success",
         code: 201,
