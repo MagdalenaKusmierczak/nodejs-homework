@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 const postContact = Joi.object({
-  name: Joi.string().alphanum().min(3).max(30).required().messages({
+  name: Joi.string().min(3).max(30).required().messages({
     "string.pattern.base": "Invalid name format",
     "any.required": "Name is required",
   }),
@@ -16,7 +16,7 @@ const postContact = Joi.object({
 });
 
 const putContact = Joi.object({
-  name: Joi.string().alphanum().min(3).max(30).messages({
+  name: Joi.string().min(3).max(30).messages({
     "string.pattern.base": "Invalid name format",
   }),
   email: Joi.string().email().messages({
@@ -27,6 +27,6 @@ const putContact = Joi.object({
   }),
 });
 module.exports = {
-    postContact,
-    putContact
-};        
+  postContact,
+  putContact,
+};
