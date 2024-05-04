@@ -2,12 +2,14 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../../models/User");
 const { postUser } = require("../../schema/users.js");
+const fs = require("fs/promises");
+const Jimp = require("jimp");
+const gravatar = require("gravatar");
+const path = require("path");
+
 require("dotenv").config();
 
-const gravatar = require("gravatar");
-// const path = require("path");
-
-// const avatarsDir = path.join(__dirname, "../../", "public", "avatars");
+const avatarsDir = path.join(__dirname, "../../", "public", "avatars");
 
 const register = async (req, res) => {
   try {
@@ -191,10 +193,30 @@ const changeSubscription = async (req, res, next) => {
   });
 };
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+
+  Jimp.read(tempUpload)
+    .then((img) => img.resize(250, 250).write(resultUpload))
+    .catch((error) => console.log(error.message));
+
+  const filename = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, filename);
+  await fs.rename(tempUpload, resultUpload);
+  const avatarURL = path.join("avatars", filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  res.status(200).json({
+    avatarURL,
+  });
+};
+
 module.exports = {
   register,
   login,
   logout,
   current,
   changeSubscription,
+  updateAvatar,
 };
