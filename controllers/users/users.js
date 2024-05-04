@@ -2,8 +2,12 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../../models/User");
 const { postUser } = require("../../schema/users.js");
-
 require("dotenv").config();
+
+const gravatar = require("gravatar");
+// const path = require("path");
+
+// const avatarsDir = path.join(__dirname, "../../", "public", "avatars");
 
 const register = async (req, res) => {
   try {
@@ -28,7 +32,13 @@ const register = async (req, res) => {
       });
     }
     const hashPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ email, password: hashPassword });
+    const avatarURL = gravatar.url(email);
+
+    const newUser = await User.create({
+      email,
+      password: hashPassword,
+      avatarURL,
+    });
 
     return res.json({
       status: "Created",
@@ -50,6 +60,17 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const validation = postUser.validate({ email, password });
+    if (validation.error) {
+      return res.json({
+        status: "rejected",
+        code: 404,
+        message: `${validation.error.message}`,
+      });
+    } else {
+      console.log("Data is valid");
+    }
+
     if (!password || !email)
       return res.status(400).json({
         status: "ValidationError",
@@ -73,7 +94,7 @@ const login = async (req, res) => {
       const token = jwt.sign(payload, process.env.SECRET_KEY, {
         expiresIn: "12h",
       });
-      await User.findByIdAndUpdate(user._id, token);
+      await User.findByIdAndUpdate(user._id, { token });
 
       return res.json({
         status: "OK",
