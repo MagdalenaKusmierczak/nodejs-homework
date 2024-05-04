@@ -20,4 +20,6 @@ usersRouter.get("/current", auth, current);
 
 usersRouter.patch("/", auth, changeSubscription);
 
+usersRouter.patch("/avatars", auth);
+
 module.exports = usersRouter;
