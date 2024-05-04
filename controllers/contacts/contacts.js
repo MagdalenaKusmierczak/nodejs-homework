@@ -6,9 +6,11 @@ const {
   removeContact,
 } = require("./services");
 
+const { postContact, putContact } = require("../../schema/contacts.js");
+
 const listContacts = async (req, res, next) => {
   try {
-     const {_id: owner} = req.user;
+    const { _id: owner } = req.user;
     const contacts = await fetchContacts(owner);
     res.json({
       status: "success",
@@ -66,6 +68,17 @@ const removesContact = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   const { name, email, phone } = req.body;
+  const validation = postContact.validate({ name, email, phone });
+  if (validation.error) {
+    return res.json({
+      status: "rejected",
+      code: 404,
+      message: `${validation.error.message}`,
+    });
+  } else {
+    console.log("Data is valid");
+  }
+
   const { _id: owner } = req.user;
   try {
     if (!name || !email || !phone) {
@@ -89,8 +102,21 @@ const addContact = async (req, res, next) => {
 
 const updateContacts = async (req, res, next) => {
   const contacts = await fetchContacts();
+   const body = req.body;
   const { contactId } = req.params;
+  
   const index = contacts.findIndex((contact) => contact.id === contactId);
+
+    const validation = putContact.validate({ ...body });
+    if (validation.error) {
+      return res.json({
+        status: "rejected",
+        code: 404,
+        message: `${validation.error.message}`,
+      });
+    } else {
+      console.log("Data is valid");
+    }
   if (index === -1) {
     return res.json({
       status: "rejected",

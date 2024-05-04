@@ -1,12 +1,24 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../../models/User");
+const { postUser, putUser } = require("../../schema/user.js");
 
 require("dotenv").config();
 
 const register = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const validation = postUser.validate({ email, password });
+    if (validation.error) {
+      return res.json({
+        status: "rejected",
+        code: 404,
+        message: `${validation.error.message}`,
+      });
+    } else {
+      console.log("Data is valid");
+    }
+
     const user = await User.findOne({ email });
     if (user) {
       return res.json({
