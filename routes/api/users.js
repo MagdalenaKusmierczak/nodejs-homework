@@ -7,6 +7,8 @@ const {
   current,
   changeSubscription,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 } = require("../../controllers/users/users");
 const auth = require("../../middlewares/authenticate");
 const uploadAvatar = require("../../middlewares/uploadAvatar");
@@ -29,8 +31,8 @@ usersRouter.patch(
   updateAvatar
 );
 
-usersRouter.get("/verify/:verificationToken");
+usersRouter.get("/verify/:verificationToken", verifyEmail);
 
-usersRouter.post("/verify/");
+usersRouter.post("/verify/", resendVerifyEmail);
 
 module.exports = usersRouter;
