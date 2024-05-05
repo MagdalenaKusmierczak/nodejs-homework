@@ -19,8 +19,10 @@ const msg = (to, token) => {
       from: "m-kusmierczak@o2.pl",
       to: to,
       subject: "Welcome in our fun database",
-      html: `<strong>/users/verify/${token}</strong>`,
-      text: `/users/verify/${token}`,
+      html: `<p>To confirm your registration, please click on the link below</p>
+  <a href="http://localhost:3000/api/users/verify/${token}">Click me</a>`,
+      text: `To confirm your registration, please go to :
+  http://localhost:3000/api/users/verify/${token}`,
     },
     (err, info) => {
       if (err) {
