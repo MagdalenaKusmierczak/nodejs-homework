@@ -24,8 +24,17 @@ const listContacts = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   try {
+    const { _id: owner } = req.user;
     const { contactId } = req.params;
+
     const contact = await fetchContact(contactId);
+    if (parseInt(contact.owner) !== parseInt(owner)) {
+      return res.json({
+        status: "rejected",
+        code: 401,
+        message: "Access denied",
+      });
+    }
     if (contact) {
       return res.json({
         status: "success",
@@ -44,7 +53,18 @@ const getContactById = async (req, res, next) => {
 
 const removesContact = async (req, res, next) => {
   const { contactId } = req.params;
+  const { _id: owner } = req.user;
   const contacts = await fetchContacts();
+  const contact = await fetchContact(contactId);
+
+  if (parseInt(contact.owner) !== parseInt(owner)) {
+    return res.json({
+      status: "rejected",
+      code: 401,
+      message: "Access denied",
+    });
+  }
+
   const index = contacts.findIndex((contact) => contact.id === contactId);
   if (index === -1) {
     return res.json({
@@ -101,22 +121,32 @@ const addContact = async (req, res, next) => {
 };
 
 const updateContacts = async (req, res, next) => {
-  const contacts = await fetchContacts();
-   const body = req.body;
   const { contactId } = req.params;
-  
+  const { _id: owner } = req.user;
+  const contact = await fetchContact(contactId);
+  if (parseInt(contact.owner) !== parseInt(owner)) {
+    return res.json({
+      status: "rejected",
+      code: 401,
+      message: "Access denied",
+    });
+  }
+
+  const contacts = await fetchContacts();
+  const body = req.body;
+
   const index = contacts.findIndex((contact) => contact.id === contactId);
 
-    const validation = putContact.validate({ ...body });
-    if (validation.error) {
-      return res.json({
-        status: "rejected",
-        code: 404,
-        message: `${validation.error.message}`,
-      });
-    } else {
-      console.log("Data is valid");
-    }
+  const validation = putContact.validate({ ...body });
+  if (validation.error) {
+    return res.json({
+      status: "rejected",
+      code: 404,
+      message: `${validation.error.message}`,
+    });
+  } else {
+    console.log("Data is valid");
+  }
   if (index === -1) {
     return res.json({
       status: "rejected",
@@ -146,6 +176,17 @@ const updateContacts = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
   const { contactId } = req.params;
   const { favorite } = req.body;
+
+  const { _id: owner } = req.user;
+  const contact = await fetchContact(contactId);
+  if (parseInt(contact.owner) !== parseInt(owner)) {
+    return res.json({
+      status: "rejected",
+      code: 401,
+      message: "Access denied",
+    });
+  }
+
   if (!favorite) {
     return res.json({
       status: "rejected",
