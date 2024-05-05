@@ -13,7 +13,7 @@ const auth = {
 
 const nodemailerMailgun = nodemailer.createTransport(mg(auth));
 
-const msg = (to, token) => {
+const sendEmail = (to, token) => {
   nodemailerMailgun.sendMail(
     {
       from: "m-kusmierczak@o2.pl",
@@ -34,4 +34,4 @@ const msg = (to, token) => {
   );
 };
 
-module.exports = msg;
+module.exports = sendEmail;

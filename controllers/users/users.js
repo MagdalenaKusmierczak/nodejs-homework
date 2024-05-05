@@ -6,6 +6,8 @@ const fs = require("fs/promises");
 const Jimp = require("jimp");
 const gravatar = require("gravatar");
 const path = require("path");
+const { nanoid } = require("nanoid");
+const sendEmail = require("../../middlewares/nodemailer.js");
 
 require("dotenv").config();
 
@@ -35,12 +37,15 @@ const register = async (req, res) => {
     }
     const hashPassword = await bcrypt.hash(password, 10);
     const avatarURL = gravatar.url(email);
+    const verificationToken = nanoid();
 
     const newUser = await User.create({
       email,
       password: hashPassword,
       avatarURL,
+      verificationToken,
     });
+    await sendEmail(email, verificationToken);
 
     return res.json({
       status: "Created",
@@ -209,6 +214,27 @@ const updateAvatar = async (req, res) => {
 
   res.status(200).json({
     avatarURL,
+  });
+};
+
+const verifyEmail = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    return res.json({
+      code: 404,
+      status: "Not found",
+      message: "User not found",
+    });
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: "",
+  });
+  return res.json({
+    code: 200,
+    status: "OK",
+    message: "Verification successful",
   });
 };
 
