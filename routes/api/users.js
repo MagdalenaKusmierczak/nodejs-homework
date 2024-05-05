@@ -29,4 +29,8 @@ usersRouter.patch(
   updateAvatar
 );
 
+usersRouter.get("/verify/:verificationToken");
+
+usersRouter.post("/verify/");
+
 module.exports = usersRouter;
