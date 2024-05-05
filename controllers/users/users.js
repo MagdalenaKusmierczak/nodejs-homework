@@ -92,6 +92,13 @@ const login = async (req, res) => {
         message: "Email or password is wrong",
       });
     }
+    if (!user.verify) {
+      return res.json({
+        status: "Unauthorized",
+        code: 401,
+        message: "Verify your email first!",
+      });
+    }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (isPasswordCorrect) {
       const payload = {
