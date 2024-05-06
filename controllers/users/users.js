@@ -6,6 +6,8 @@ const fs = require("fs/promises");
 const Jimp = require("jimp");
 const gravatar = require("gravatar");
 const path = require("path");
+const { nanoid } = require("nanoid");
+const sendEmail = require("../../middlewares/nodemailer.js");
 
 require("dotenv").config();
 
@@ -35,12 +37,15 @@ const register = async (req, res) => {
     }
     const hashPassword = await bcrypt.hash(password, 10);
     const avatarURL = gravatar.url(email);
+    const verificationToken = nanoid();
 
     const newUser = await User.create({
       email,
       password: hashPassword,
       avatarURL,
+      verificationToken,
     });
+    await sendEmail(email, verificationToken);
 
     return res.json({
       status: "Created",
@@ -85,6 +90,13 @@ const login = async (req, res) => {
         status: "Unauthorized",
         code: 401,
         message: "Email or password is wrong",
+      });
+    }
+    if (!user.verify) {
+      return res.json({
+        status: "Unauthorized",
+        code: 401,
+        message: "Verify your email first!",
       });
     }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
@@ -212,6 +224,53 @@ const updateAvatar = async (req, res) => {
   });
 };
 
+const verifyEmail = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    return res.json({
+      code: 404,
+      status: "Not found",
+      message: "User not found",
+    });
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: "",
+  });
+  return res.json({
+    code: 200,
+    status: "OK",
+    message: "Verification successful",
+  });
+};
+
+const resendVerifyEmail = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.json({
+      code: 404,
+      status: "Not found",
+      message: "User not found",
+    });
+  }
+  if (user.verify) {
+    return res.json({
+      code: 400,
+      status: "Request failed",
+      message: "Verification has already been passed",
+    });
+  }
+
+  await sendEmail(email, user.verificationToken);
+  return res.json({
+    code: 200,
+    status: "OK",
+    message: "Verification email sent",
+  });
+};
+
 module.exports = {
   register,
   login,
@@ -219,4 +278,6 @@ module.exports = {
   current,
   changeSubscription,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 };
